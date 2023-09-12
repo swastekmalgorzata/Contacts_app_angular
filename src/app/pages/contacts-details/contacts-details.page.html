@@ -1,13 +1,145 @@
-<ion-header [translucent]="true">
+
+<ion-app>
+  
+<ion-header [translucent]="true" >
   <ion-toolbar>
-    <ion-title>contactsDetails</ion-title>
+    <ion-button slot="start" fill="solid" class="button-back"   routerLink="/contacts">
+      <ion-icon name="chevron-back"></ion-icon>
+    </ion-button>
+    <ion-button slot="end" fill="solid" class="button-edit" id="open-edit-modal">
+      <ion-icon name="pencil"></ion-icon>
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">contactsDetails</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+<ion-content [fullscreen]="true" >
+  
+
+  <div class="page-container">
+    <!-- hero -->
+    <div class="hero-container">
+      
+      <ion-img  src="https://img.freepik.com/free-vector/gradient-dynamic-purple-lines-background_23-2148995757.jpg"></ion-img>
+      <ion-chip *ngIf="contact.category!=''">
+        {{contact.category}}
+        
+      </ion-chip>
+    
+    </div>
+
+    <!-- content -->
+    <div class="content-container">
+      <!-- user info -->
+      <div class="name-container">
+        <ion-text algin="center">
+          <h1>{{contact.name}} {{contact.surname}}</h1>
+        </ion-text>
+        
+      </div>
+
+      <!-- number and email-->
+      <div class="contact-details">
+        <ion-button fill="clear">
+          <ion-icon  name="call-outline"></ion-icon> <ion-text>{{contact.phoneNumber}}</ion-text>
+        </ion-button> 
+        <ion-button  fill="clear" *ngIf="contact.email">
+          <ion-icon name="mail-outline"></ion-icon> <ion-text><p> {{contact.email}}</p></ion-text>
+        </ion-button>
+        
+      </div>
+
+      <!-- contact buttons -->
+      <div class="contact-buttons-container">
+        <ion-item class="ion-no-padding" lines="none">
+          <div class="inner-container">
+            <div class="button-container">
+              <ion-button ><ion-icon  name="call"></ion-icon></ion-button> 
+              <ion-button ><ion-icon  name="chatbubbles"></ion-icon></ion-button> 
+              <ion-button *ngIf="contact.email" ><ion-icon name="mail"></ion-icon></ion-button>
+          </div>
+        </div>
+          
+        </ion-item>
+      </div>
+
+      <!-- stats -->
+      <div *ngIf="contact.birthday!=''" class="stats-container">
+        <div class="stat-container">
+          <ion-text><span class="description">Birthday</span></ion-text>
+          <ion-text><span class="stat">{{contact.birthday}}</span></ion-text>
+        </div>
+      </div>
+
+      
+    </div>
+  </div>
+   
+  <div class="edit-contact">
+    <ion-modal trigger="open-edit-modal" (willDismiss)="onWillDismiss($event)">
+      <ng-template>
+  
+        
+        <ion-footer>
+          <ion-toolbar>
+            <ion-buttons slot="start">
+              <ion-button color="modal" (click)="cancel()">Cancel</ion-button>
+            </ion-buttons>
+          
+            <ion-buttons slot="end">
+              <ion-button color="modal" (click)="confirm()" [strong]="true">Save</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-footer>
+  
+        <ion-content class="ion-padding">
+  
+          <ion-item>
+            <ion-input labelPlacement="floating" [(ngModel)]="userInput.phoneNumber">
+              <div slot="label">Phone Number <ion-text color="danger">(Required)</ion-text></div>
+            </ion-input>
+          </ion-item>
+  
+          <ion-item>
+            <ion-input label="Name" labelPlacement="floating"   [(ngModel)]="userInput.name"></ion-input>
+          </ion-item>
+  
+          <ion-item>
+            <ion-input label="Surname" labelPlacement="floating" type="search" [(ngModel)]="userInput.surname"></ion-input>
+          </ion-item>
+  
+          <ion-item>
+            <ion-input label="Category" labelPlacement="floating"  [(ngModel)]="userInput.category"></ion-input>
+            </ion-item>
+
+          <ion-item>
+            <ion-input type="email" label="Email" labelPlacement="floating" [(ngModel)]="userInput.email"></ion-input>
+          </ion-item>
+          <div class="ion-padding">
+          <ion-label > Birthday:</ion-label></div>
+          <ion-datetime color="modal"   presentation="date" [preferWheel]="true" [(ngModel)]="birthday"></ion-datetime>
+        
+        </ion-content>
+       
+          
+  
+        <ion-alert
+        [isOpen]="isAlertOpen"
+        header="Can't Save"
+        subHeader="Required field is empty"
+        message="Enter Phone Number to save changes"
+        [buttons]="alertButtons"
+        (didDismiss)="setOpen(false)"
+      ></ion-alert>
+
+    </ng-template>
+  </ion-modal>
+
+
+
+</div>
+
+
+
 </ion-content>
+</ion-app>

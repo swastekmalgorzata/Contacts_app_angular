@@ -1,13 +1,374 @@
-<ion-header [translucent]="true">
+
+
+<ion-header [translucent]="true" >
   <ion-toolbar>
-    <ion-title>contacts</ion-title>
+    <ion-buttons [collapse]="true" slot="end">
+      <ion-button (click)="isModalOpen=true" class="button-add" >
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+      <ion-button class="buttons-other"  (click)="searching=!searching">
+        <ion-icon name="search"></ion-icon>
+      </ion-button>
+      
+      <ion-button class="buttons-other" (click)="openMenu()">
+        <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
+      </ion-button></ion-buttons>
+    <ion-title slot="start">Contacts</ion-title>
+    
+  </ion-toolbar>
+  <ion-toolbar  *ngIf="searching">
+  <ion-searchbar [(ngModel)]="searchText" (ionInput)="Search()" show-clear-button="focus" ></ion-searchbar>
+ <!-- <ion-button class="button-close" fill= "clear" slot="primary" (click)="searching=false">
+    <ion-icon slot="icon-only" ios="close" md="close"></ion-icon>
+  </ion-button> -->
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+
+
+
+<ion-content [fullscreen]="true" [scrollY]="!scroll" >
+  <app-alphabet-scroll (letterSelected)="scrollToLetter($event)" (scrollingLetter)="letterScrollActive($event)"></app-alphabet-scroll>
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">contacts</ion-title>
+      <ion-title size="large" >Contacts</ion-title>
+      <ion-buttons [collapse]="true" slot="end">
+        <ion-button (click)="isModalOpen=true" class="button-add" >
+          <ion-icon name="add"></ion-icon>
+        </ion-button>
+        <ion-button class="buttons-other" (click)="searching=!searching">
+          <ion-icon name="search"></ion-icon>
+        </ion-button>
+        <ion-button class="buttons-other" (click)="openMenu()">
+          <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
+        </ion-button></ion-buttons>
+      
     </ion-toolbar>
   </ion-header>
+  <div id="main-content">
+ <div class="page-container"  >
+  
+  <!-- categories -->
+  <div class="categoris-container">
+  <ion-segment [scrollable]="true" value="all"  color="modal">
+
+    <ion-segment-button  value="all" (click)="filterByCategory('All')" >
+      All
+    </ion-segment-button>
+    <ion-segment-button  value="{{category}}" *ngFor="let category of categories" (click)="filterByCategory(category)">
+      {{category}}
+    </ion-segment-button>
+  
+  </ion-segment>
+  </div>
+  
+ 
+ <div class="contacts-container">
+
+ 
+  
+  <ion-item-group *ngFor="let group of groupedContacts">
+    <ion-item-divider sticky>
+      <ion-label >{{group.key}}</ion-label>
+    </ion-item-divider>
+  
+
+        
+      <ion-item-sliding  *ngFor="let contact of group.contacts" >
+        <ion-item-options side="start">
+          <ion-item-option  (click)="ViewContact(contact.id)">View</ion-item-option>
+        </ion-item-options>
+
+        <ion-item>
+          <ion-col *ngIf="isSurnameFirst"><strong >{{contact.surname}} {{contact.name}}</strong></ion-col>
+          <ion-col *ngIf="!isSurnameFirst"><strong >{{contact.name}} {{contact.surname}} </strong></ion-col>
+          <ion-col size="3.5"*ngIf="contact.category"><ion-badge>{{contact.category}}</ion-badge></ion-col>
+        </ion-item>
+
+        <ion-item-options>
+          <ion-item-option class="call-option"><ion-icon name="call"></ion-icon></ion-item-option>
+          <ion-item-option class="message-option" ><ion-icon name="chatbubbles"></ion-icon></ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding> 
+      
+
+  </ion-item-group>
+
+  
+  
+</div>
+</div>
+
+<div class="create-contact">
+  <ion-modal  [isOpen]="isModalOpen"  (willDismiss)="onWillDismiss($event)">
+    <ng-template #other_content >
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>New Contact</ion-title>
+        </ion-toolbar>
+      </ion-header>
+
+      
+      <ion-footer>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button color="modal" (click)="cancel()">Cancel</ion-button>
+          </ion-buttons>
+        
+          <ion-buttons slot="end">
+            <ion-button color="modal" (click)="confirm()" [strong]="true">Save</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-footer>
+
+      <ion-content class="ion-padding">
+
+        <ion-item>
+          <ion-input labelPlacement="floating" type="text" [(ngModel)]="userInput.phoneNumber">
+            <div slot="label">Phone Number <ion-text color="danger">(Required)</ion-text></div>
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Name" labelPlacement="floating" type="text" [(ngModel)]="userInput.name"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Surname" labelPlacement="floating" type="search" [(ngModel)]="userInput.surname"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Category" labelPlacement="floating" type="text" [value]="categorySet" [(ngModel)]="userInput.category"></ion-input>
+          <ion-button color="modal-select" id="popover-button">Select</ion-button>
+          <ion-popover trigger="popover-button" [dismissOnSelect]="true">
+            <ng-template>
+              <ion-content>
+                <ion-list>
+                  <ion-item  (click)="categorySet=category" *ngFor=" let category of categories" [detail]="false" >
+                    {{category}}
+                  </ion-item>
+
+                </ion-list>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+          </ion-item>
+        <ion-item>
+          <ion-input type="email" label="Email" labelPlacement="floating" [(ngModel)]="userInput.email"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input type="date"  label="Birthday" labelPlacement="floating" [(ngModel)]="userInput.birthday"></ion-input>
+        </ion-item>
+      </ion-content>
+
+      <ion-alert
+      [isOpen]="isAlertOpen"
+      header="Can't Save"
+      subHeader="Required field is empty"
+      message="Enter Phone Number to create contatct"
+      [buttons]="alertButtons"
+      (didDismiss)="setOpen(false)"
+    ></ion-alert>
+ 
+    </ng-template>
+  </ion-modal>
+</div>
+</div>
+
+
+<ion-popover [isOpen]="isPopoverOpen" [dismissOnSelect]="true" (didDismiss)="isPopoverOpen = false">
+  <ng-template>
+    <ion-content>
+      <ion-list>
+        <ion-item [button]="true" [detail]="false" (click)="changeSettings">Sort by {{sortBy}}</ion-item>
+        <ion-item [button]="true" [detail]="false">Option 2</ion-item>
+        <ion-item [button]="true" id="nested-trigger">More options...</ion-item>
+
+        <ion-popover trigger="nested-trigger" [dismissOnSelect]="true" side="end">
+          <ng-template>
+            <ion-content>
+              <ion-list>
+                <ion-item [button]="true" [detail]="false">Nested option</ion-item>
+              </ion-list>
+            </ion-content>
+          </ng-template>
+        </ion-popover>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
+
+
+
+
 </ion-content>
+
+
+<ion-menu side="end" menuId="menu" contentId="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Settings</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="ion-padding">
+    <ion-label>Sort contacts by:</ion-label>
+    <ion-segment value="{{sortBy}}">
+      <ion-segment-button value="Surname" (click)="changeSettings(true, isSurnameFirst)">
+        <ion-label>Surname</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Name" (click)="changeSettings(false, isSurnameFirst)">
+        <ion-label>Name</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    <ion-label>Contact's name format:</ion-label>
+    <ion-segment value="{{isSurnameFirst}}" >
+      <ion-segment-button value="true" (click)="changeSettings(groupBySurname, true)">
+        <ion-label>Surname, Name</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="false" (click)="changeSettings(groupBySurname, false)">
+        <ion-label>Name, Surname</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-content>
+</ion-menu>
+
+
+
+
+
+
+ <!--
+
+    <ion-item-group *ngFor="let letter of alphabet">
+    <ion-item-divider sticky>
+      <ion-label >{{letter}}</ion-label>
+    </ion-item-divider>
+  
+    <ion-row  *ngFor="let contact of filteredContacts" >
+        
+      <ion-item-sliding  *ngIf="!IsOther(contact.surname) && contact.surname[0].toUpperCase()==letter">
+        <ion-item-options side="start">
+          <ion-item-option  (click)="ViewContact(contact.id)">View</ion-item-option>
+        </ion-item-options>
+
+        <ion-item>
+          <ion-col size="1.5"*ngIf="!IsOther(contact.name)"><ion-badge >{{contact.surname[0].toUpperCase()}}{{contact.name[0].toUpperCase()}}</ion-badge></ion-col>
+          <ion-col size="1.5" *ngIf="IsOther(contact.name)"><ion-badge >{{contact.surname[0].toUpperCase()}}{{contact.name[0]}}</ion-badge></ion-col>
+          <ion-col><strong >{{contact.surname}} {{contact.name}}</strong></ion-col>
+          <ion-col size="3.5"*ngIf="contact.category"><ion-badge>{{contact.category}}</ion-badge></ion-col>
+        </ion-item>
+
+        <ion-item-options>
+          <ion-item-option><ion-icon name="call"></ion-icon></ion-item-option>
+          <ion-item-option ><ion-icon name="chatbubbles"></ion-icon></ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+
+       If surname is not a string or first character is not a letter
+       <ion-item-sliding *ngIf="IsOther(contact.surname)&&letter=='*'">
+        <ion-item-options side="start">
+          <ion-item-option  (click)="ViewContact(contact.id)">View</ion-item-option>
+        </ion-item-options>
+
+      <ion-item>
+        <ion-col size="1.5"><ion-badge >{{contact.surname[0]}}{{contact.name[0]}}</ion-badge></ion-col>
+        <ion-col ><strong >{{contact.surname}} {{contact.name}}</strong></ion-col>
+        <ion-col size="3" *ngIf="contact.category"><ion-badge>{{contact.category}}</ion-badge></ion-col>
+      </ion-item>
+
+      <ion-item-options>
+        <ion-item-option><ion-icon name="call"></ion-icon></ion-item-option>
+        <ion-item-option ><ion-icon name="chatbubbles"></ion-icon></ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+
+    </ion-row>
+      
+
+      
+  </ion-item-group>
+
+
+
+
+
+ <ion-grid *ngFor="let letter of alphabet">
+    <ion-row style="background-color:antiquewhite" ><ion-col ><div>{{letter}}</div></ion-col></ion-row>
+    
+    
+          <ion-row  *ngFor="let contact of filteredContacts" >
+            <ion-item-sliding *ngIf="IsOther(contact.surname)&&letter=='*'">
+              <ion-item-options side="start">
+                <ion-item-option  (click)="ViewContact(contact.id)">View</ion-item-option>
+              </ion-item-options>
+            <ion-item>
+          <ion-col size="1.5"><ion-badge >{{contact.surname[0]}}{{contact.name[0]}}</ion-badge></ion-col>
+          <ion-col ><strong >{{contact.surname}} {{contact.name}}</strong></ion-col>
+          <ion-col size="3" *ngIf="contact.category"><ion-badge>{{contact.category}}</ion-badge></ion-col>
+        </ion-item>
+        <ion-item-options>
+          <ion-item-option><ion-icon name="call"></ion-icon></ion-item-option>
+          <ion-item-option ><ion-icon name="chatbubbles"></ion-icon></ion-item-option>
+        </ion-item-options>
+          </ion-item-sliding>
+
+          <ion-item-sliding  *ngIf="!IsOther(contact.surname) && contact.surname[0].toUpperCase()==letter">
+            <ion-item>
+              <ion-col size="1.5"*ngIf="!IsOther(contact.name)"><ion-badge >{{contact.surname[0].toUpperCase()}}{{contact.name[0].toUpperCase()}}</ion-badge></ion-col>
+              <ion-col size="1.5" *ngIf="IsOther(contact.name)"><ion-badge >{{contact.surname[0].toUpperCase()}}{{contact.name[0]}}</ion-badge></ion-col>
+            <ion-col><strong >{{contact.surname}} {{contact.name}}</strong></ion-col>
+          <ion-col size="3.5"*ngIf="contact.category"><ion-badge>{{contact.category}}</ion-badge></ion-col>
+        </ion-item>
+        <ion-item-options>
+          <ion-item-option>View</ion-item-option>
+          <ion-item-option color="danger">Delete</ion-item-option>
+        </ion-item-options>
+          </ion-item-sliding>
+
+      </ion-row>
+      <ion-row><ion-col><br></ion-col></ion-row>
+
+      
+  </ion-grid>
+
+
+<ion-grid *ngFor="let letter of alphabet">
+    <ion-row><ion-col ><div>{{letter}}</div></ion-col></ion-row>
+    
+    <ion-grid [fixed]="true" *ngFor="let contact of contacts">
+          <ion-row  *ngIf="IsOther(contact.surname)&&letter=='*'">
+            <ion-item-sliding>
+            <ion-item>
+          <ion-col size="1.5"><ion-badge >{{contact.surname[0]}}{{contact.name[0]}}</ion-badge></ion-col>
+          <ion-col ><strong >{{contact.surname}} {{contact.name}}</strong></ion-col>
+          <ion-col size="3" *ngIf="contact.category"><ion-badge>{{contact.category}}</ion-badge></ion-col>
+        </ion-item>
+        <ion-item-options>
+          <ion-item-option>Favorite</ion-item-option>
+          <ion-item-option color="danger">Delete</ion-item-option>
+        </ion-item-options>
+          </ion-item-sliding>
+      </ion-row>
+      
+
+      <ion-row *ngIf="!IsOther(contact.surname) && contact.surname[0].toUpperCase()==letter">
+        <ion-item-sliding>
+          <ion-item>
+            <ion-col size="1.5"*ngIf="!IsOther(contact.name)"><ion-badge >{{contact.surname[0].toUpperCase()}}{{contact.name[0].toUpperCase()}}</ion-badge></ion-col>
+            <ion-col size="1.5" *ngIf="IsOther(contact.name)"><ion-badge >{{contact.surname[0].toUpperCase()}}{{contact.name[0]}}</ion-badge></ion-col>
+          <ion-col><strong >{{contact.surname}} {{contact.name}}</strong></ion-col>
+        <ion-col size="3"*ngIf="contact.category"><ion-badge>{{contact.category}}</ion-badge></ion-col>
+      </ion-item>
+      <ion-item-options>
+        <ion-item-option>Favorite</ion-item-option>
+        <ion-item-option color="danger">Delete</ion-item-option>
+      </ion-item-options>
+        </ion-item-sliding>
+      </ion-row>  
+
+
+    </ion-grid>
+      
+  </ion-grid>
+-->

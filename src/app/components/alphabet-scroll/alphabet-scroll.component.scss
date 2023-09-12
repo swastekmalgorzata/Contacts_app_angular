@@ -1,0 +1,38 @@
+.letter-sidebar{
+    position:fixed;
+    top: 20%;
+    z-index: 101;
+    right: 0px;
+    
+    li{
+    
+        cursor: pointer;
+        list-style: none;
+        width: 30px;
+        height: 18px;
+        text-align:center;
+        font-weight: 500;
+        padding-bottom: 5%;
+        font-size: 3.2vw;
+       a{
+        color:  #877cb8d2;
+    } 
+           
+    }
+    @media screen and (min-height: 730px)  {
+        li{
+            height: 22px;
+            padding-bottom: 10%;
+            font-size: 3.5vw;
+        }
+
+    }
+    @media screen and (min-height: 800px)  {
+        li{
+            padding-bottom: 16%;
+            font-size: 3.8vw;
+        }
+
+    }
+    
+}
