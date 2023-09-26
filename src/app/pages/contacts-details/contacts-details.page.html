@@ -6,8 +6,8 @@
     <ion-button slot="start" fill="solid" class="button-back"   routerLink="/contacts">
       <ion-icon name="chevron-back"></ion-icon>
     </ion-button>
-    <ion-button slot="end" fill="solid" class="button-edit" id="open-edit-modal">
-      <ion-icon name="pencil"></ion-icon>
+    <ion-button  slot="end" fill="solid" class="button-edit" (click)="_openPopover($event)">
+      <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
     </ion-button>
   </ion-toolbar>
 </ion-header>
@@ -75,8 +75,10 @@
     </div>
   </div>
    
+
+  <!-- EDITING -->
   <div class="edit-contact">
-    <ion-modal trigger="open-edit-modal" (willDismiss)="onWillDismiss($event)">
+    <ion-modal [isOpen]="isModalOpen" (willDismiss)="onWillDismiss($event)">
       <ng-template>
   
         
@@ -117,7 +119,8 @@
           </ion-item>
           <div class="ion-padding">
           <ion-label > Birthday:</ion-label></div>
-          <ion-datetime color="modal"   presentation="date" [preferWheel]="true" [(ngModel)]="birthday"></ion-datetime>
+          <ion-checkbox labelPlacement="start" [(ngModel)]="editBirthday">Edit Birthday</ion-checkbox>
+          <ion-datetime *ngIf="editBirthday" color="modal" presentation="date" [preferWheel]="true" [(ngModel)]="birthday"></ion-datetime>
         
         </ion-content>
        
@@ -134,12 +137,17 @@
 
     </ng-template>
   </ion-modal>
-
-
-
 </div>
 
 
+
+
+<ion-alert
+        [isOpen]="isDeleteAlertOpen"
+        header="Delete Contact?"
+        [buttons]="deleteAlertButtons"
+        (didDismiss)="setResult($event)"
+      ></ion-alert>
 
 </ion-content>
 </ion-app>

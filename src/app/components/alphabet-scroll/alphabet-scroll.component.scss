@@ -19,6 +19,7 @@
     } 
            
     }
+   
     @media screen and (min-height: 730px)  {
         li{
             height: 22px;
@@ -34,5 +35,13 @@
         }
 
     }
-    
+    @media screen and (min-width: 580px){
+        li{
+            width: 55px;
+            height: 25px;
+            padding-bottom: 10%;
+            font-size: 18px
+        }
+    }
+
 }

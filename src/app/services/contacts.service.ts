@@ -62,20 +62,37 @@ export class ContactsService {
 
   editContacts(id:string, apiRequest: ApiRequest) {
     const httpOptions = {
-      headers: new HttpHeaders({ 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUb2tlbkZvck15QXBpIiwianRpIjoiM2U1YmFkN2EtODcwYi00NGI3LWJkNTYtMjg0MWM4NzBkYzEzIiwiaWF0IjoiMDkvMTIvMjAyMyAwMjo1MjowMiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiMzU3MGQ5YjgtYTVmOC00MTNlLTljMTAtZGFiNTE1YzljZDYzIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6InVzZXIyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoidXNlcjJAbzIucGwiLCJleHAiOjE2OTQ0ODg5MjIsImlzcyI6IkNvbnRhY3RzQXBwIiwiYXVkIjoiQ29udGFjdHNBcHAifQ.N9K9rfZCav8qyvbPEGOcmDknuJidfE8o4thp2x8wlXg',
-      'Content-Type': 'application/json',
+      headers: new HttpHeaders({'Content-Type': 'application/json',
       'Accept':'*/*',
       'Access-Control-Allow-Origin':'*'
     }),
     };
     
     console.log(apiRequest)
-    return this.http.put<any>(`${environment.baseUrl}`+'/'+id,  apiRequest, httpOptions);
+    return this.http.put<any>(`${environment.baseUrl}`+'/'+id,  apiRequest, httpOptions).pipe(
+      catchError((error, caught) => {
+        console.error('catchError', error);
+        return throwError(() => new Error('Something bad happened; please try again later.')
+        );
+      })
+    );
   }
 
 
-  deleteContact(){
-    
+  deleteContact(id:string) {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json',
+      'Accept':'*/*',
+      'Access-Control-Allow-Origin':'*'
+    }),
+    };
+    return this.http.delete<any>(`${environment.baseUrl}`+'/'+id).pipe(
+      catchError((error, caught) => {
+        console.error('catchError', error);
+        return throwError(() => new Error('Something bad happened; please try again later.')
+        );
+      })
+    );
   }
 
   

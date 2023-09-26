@@ -49,9 +49,7 @@ export class AlphabetScrollComponent  implements AfterViewInit {
     })
   }
   goToLetter(letter:any){
-    if (this.lastOpen==letter) return;
     
-    this.lastOpen = letter;
     this.letterSelected.emit(letter);
     
 

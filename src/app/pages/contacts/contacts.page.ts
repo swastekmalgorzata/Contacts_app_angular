@@ -48,6 +48,7 @@ export class ContactsPage implements OnInit {
   scroll: boolean = false;
 
   sortBy ='Surname'
+  maxId=0
 
   ngOnInit() {
     this.loadContacts();    
@@ -71,17 +72,20 @@ export class ContactsPage implements OnInit {
       let result = Object(res);
     
       for (let data of result){
+        if(data.id>this.maxId){
+          this.maxId=data.id
+        }
         for (let element in data){
+          
           if(!data[element]){
             data[element]='';
           }
+        }
           if(!data.name && !data.surname){
             data.name = data.phoneNumber
           }
-          
-        }
+        
       }
-      
           
       this.contacts = result; 
       this.GetCategories();
@@ -94,11 +98,24 @@ export class ContactsPage implements OnInit {
 
   } 
 
+  getMaxId(){
+    this.conatctsService.getContacts().subscribe((res) => {
+      
+      let result = Object(res);
+    
+      for (let data of result){
+        if(data.id>this.maxId){
+          this.maxId=data.id
+        }}
+    });   
+  }
+
   createContact(userInput: ApiRequest)
     {
       this.conatctsService.createContact(userInput).subscribe((res)=>
       {
-        console.log(res);
+        this.maxId=res.id
+        this.ViewContact(''+(this.maxId))
       })
     }
   
@@ -236,6 +253,7 @@ export class ContactsPage implements OnInit {
 
       }
     }
+
 
 
     GroupContacts(){
@@ -434,7 +452,7 @@ onWillDismiss(event: Event) {
      console.log(this.userInput)
     this.createContact(this.userInput);
     this.isModalOpen = false;
-    this.ViewContact(''+(this.contacts.length +1))
+    
   }
 }
 
