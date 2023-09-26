@@ -47,17 +47,19 @@ ion-header {
   }
   
   ion-menu{
-    
+    .md{
     ion-segment{      
       padding-bottom: 5%;
       ion-segment-button{
         color: #5a55a3;
+        
         ion-label{
           font-size: 11px;
           color: #5a55a3;
         }
       }
     }
+  }
   }
 
   // content
